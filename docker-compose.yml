@@ -1,0 +1,33 @@
+version: '3'
+services:
+  mysql5.7-Docker:
+    container_name: mysql-docker
+    image: mysql:5.7
+    networks:
+      springboot-mysql-network:
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_USER=thimmu
+      - MYSQL_PASSWORD=thimmu123
+      - MYSQL_DATABASE=testDB
+    volumes:
+      - ./mysql-data1:/var/lib/mysql57:rw
+      - ./mysql-init1:/docker-entrypoint-initdb.d/:ro
+  springboot-mysql-container:
+    container_name: spring-boot-docker
+    image: docker-springboot-mysql:1.0
+    ports:
+      - 5010:8080
+    networks:
+      springboot-mysql-network:
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql5.7-Docker:3306/testDB?useSSL=false&allowPublicKeyRetrieval=true
+      SPRING_DATASOURCE_USERNAME: thimmu
+      SPRING_DATASOURCE_PASSWORD: thimmu123
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    depends_on:
+      - mysql5.7-Docker
+networks:
+  springboot-mysql-network:
